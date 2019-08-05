@@ -1,9 +1,9 @@
 package io.github.anotherjack.avoidonresult;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 import io.reactivex.Observable;
 
@@ -16,7 +16,7 @@ public class AvoidOnResult {
     private static final String TAG = "AvoidOnResult";
     private AvoidOnResultFragment mAvoidOnResultFragment;
 
-    public AvoidOnResult(Activity activity) {
+    public AvoidOnResult(FragmentActivity activity) {
         mAvoidOnResultFragment = getAvoidOnResultFragment(activity);
     }
 
@@ -24,11 +24,11 @@ public class AvoidOnResult {
         this(fragment.getActivity());
     }
 
-    private AvoidOnResultFragment getAvoidOnResultFragment(Activity activity) {
+    private AvoidOnResultFragment getAvoidOnResultFragment(FragmentActivity activity) {
         AvoidOnResultFragment avoidOnResultFragment = findAvoidOnResultFragment(activity);
         if (avoidOnResultFragment == null) {
             avoidOnResultFragment = new AvoidOnResultFragment();
-            FragmentManager fragmentManager = activity.getFragmentManager();
+            FragmentManager fragmentManager = activity.getSupportFragmentManager();
             fragmentManager
                     .beginTransaction()
                     .add(avoidOnResultFragment, TAG)
@@ -38,8 +38,8 @@ public class AvoidOnResult {
         return avoidOnResultFragment;
     }
 
-    private AvoidOnResultFragment findAvoidOnResultFragment(Activity activity) {
-        return (AvoidOnResultFragment) activity.getFragmentManager().findFragmentByTag(TAG);
+    private AvoidOnResultFragment findAvoidOnResultFragment(FragmentActivity activity) {
+        return (AvoidOnResultFragment) activity.getSupportFragmentManager().findFragmentByTag(TAG);
     }
 
     public Observable<ActivityResultInfo> startForResult(Intent intent) {

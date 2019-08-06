@@ -1,3 +1,5 @@
+## 本分支增加v4包的支持
+
 原理讲解文章：[避免使用onActivityResult，以提高代码可读性](https://juejin.im/post/5a4611786fb9a0451a76b565)
 
 配合AOP的实践文章：[一个注解搞定登录注册、实名认证及购买vip等业务流程](https://juejin.im/post/5b29cfb3518825748e54595b)

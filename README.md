@@ -7,7 +7,7 @@ keywords:   onActivityResult
 
 ---
 
-
+### 在源码基础上增加了v4包的支持，这个主要针对的是fragment
 
 # 优雅地封装和使用 onActivityResult 
 

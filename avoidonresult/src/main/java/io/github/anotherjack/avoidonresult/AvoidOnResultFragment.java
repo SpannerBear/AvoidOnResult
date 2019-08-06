@@ -3,9 +3,8 @@ package io.github.anotherjack.avoidonresult;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.SparseArray;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import io.reactivex.Observable;
@@ -18,18 +17,18 @@ import io.reactivex.subjects.PublishSubject;
  */
 
 public class AvoidOnResultFragment extends Fragment {
-    private Map<Integer, PublishSubject<ActivityResultInfo>> mSubjects = new HashMap<>();
-    private Map<Integer, AvoidOnResult.Callback> mCallbacks = new HashMap<>();
-
+    private SparseArray<PublishSubject<ActivityResultInfo>> mSubjects = new SparseArray<>();
+    private SparseArray<AvoidOnResult.Callback> mCallbacks = new SparseArray<>();
+    
     public AvoidOnResultFragment() {
     }
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
     }
-
+    
     public Observable<ActivityResultInfo> startForResult(final Intent intent) {
         final PublishSubject<ActivityResultInfo> subject = PublishSubject.create();
         return subject.doOnSubscribe(new Consumer<Disposable>() {
@@ -41,38 +40,40 @@ public class AvoidOnResultFragment extends Fragment {
             }
         });
     }
-
+    
     public void startForResult(Intent intent, AvoidOnResult.Callback callback) {
         int requestCode = generateRequestCode();
         mCallbacks.put(requestCode, callback);
         startActivityForResult(intent, requestCode);
     }
-
+    
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //rxjava方式的处理
-        PublishSubject<ActivityResultInfo> subject = mSubjects.remove(requestCode);
+        PublishSubject<ActivityResultInfo> subject = mSubjects.get(requestCode);
+        mSubjects.remove(requestCode);
         if (subject != null) {
             subject.onNext(new ActivityResultInfo(resultCode, data));
             subject.onComplete();
         }
-
+        
         //callback方式的处理
-        AvoidOnResult.Callback callback = mCallbacks.remove(requestCode);
+        AvoidOnResult.Callback callback = mCallbacks.get(requestCode);
+        mCallbacks.remove(requestCode);
         if (callback != null) {
             callback.onActivityResult(resultCode, data);
         }
     }
-
-    private int generateRequestCode(){
+    
+    private int generateRequestCode() {
         Random random = new Random();
-        for (;;){
+        for (; ; ) {
             int code = random.nextInt(65536);
-            if (!mSubjects.containsKey(code) && !mCallbacks.containsKey(code)){
+            if (mSubjects.get(code) == null && mCallbacks.get(code) == null) {
                 return code;
             }
         }
     }
-
+    
 }
